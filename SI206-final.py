@@ -59,6 +59,37 @@ def heightandweight():
             placer1.append(L)
             y = y + 1
         placer2.append(placer1)
+    teamavgheight= []
+    for row in placer2:
+        total = 0
+        x = 0
+        while x < len(row):
+            total += row[x][0] 
+            x += 1
+        teamavgheight.append(total/len(row))
+    cur.execute('DROP TABLE IF EXISTS avgHeightOfTeam')
+    cur.execute('CREATE TABLE avgHeightOfTeam (Team STRING PRIMARY KEY, AvgHeight INTEGER)')
+    counter = 0
+
+    teamavgWeight= []
+    for row in placer2:
+        total = 0
+        x = 0
+        while x < len(row):
+            total += row[x][1] 
+            x += 1
+        teamavgWeight.append(total/len(row))
+    while counter < len(teamavgheight):
+        cur.execute('INSERT INTO avgHeightOfTeam (Team, AvgHeight) VALUES (?,?)', (abbreviations[counter], teamavgheight[counter]))
+        counter += 1
+
+    cur.execute('DROP TABLE IF EXISTS avgWeightOfTeam')
+    cur.execute('CREATE TABLE avgWeightOfTeam (Team STRING PRIMARY KEY, AvgWeight INTEGER)')
+    counter = 0
+    while counter < len(teamavgheight):
+        cur.execute('INSERT INTO avgWeightOfTeam (Team, AvgWeight) VALUES (?,?)', (abbreviations[counter], teamavgWeight[counter]))
+        counter += 1
+
     cur.execute('DROP TABLE IF EXISTS playerPhysicals')
     cur.execute('CREATE TABLE playerPhysicals (Id INTEGER PRIMARY KEY, Team STRING, HeightInInches INTEGER, WeightInLbs INTEGER)')
     k = 1  
@@ -71,6 +102,7 @@ def heightandweight():
             z += 1
             k += 1
         x += 1
+    
     conn.commit()
 heightandweight()
 
@@ -169,7 +201,6 @@ def joinAverageReupload():
             dict2[data[0]] = data[2]
     cur.execute('DROP TABLE IF EXISTS Effavg')
     cur.execute('CREATE TABLE Effavg (Team STRING PRIMARY KEY, Average INTEGER)')
-
     for abb in countedteamabb:
         average = dict1[abb] / countedEentries[abb]
         cur.execute('INSERT INTO Effavg (Team, Average) VALUES (?,?)', (abb, average))
